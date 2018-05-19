@@ -10,6 +10,7 @@
 
 #maven ignore
 target/
+.springBeans
 
 #eclipse ignore
 .settings/
