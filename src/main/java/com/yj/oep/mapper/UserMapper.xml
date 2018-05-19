@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yj.oep.mapper.UserMapper">
+	<resultMap id="BaseResultMap" type="com.yj.oep.entity.User">
+		<constructor>
+			<idArg column="uid" javaType="java.lang.Integer" jdbcType="INTEGER" />
+			<arg column="username" javaType="java.lang.String" jdbcType="VARCHAR" />
+			<arg column="password" javaType="java.lang.String" jdbcType="VARCHAR" />
+		</constructor>
+	</resultMap>
+	<select id="selectAllUsers" resultType="com.yj.oep.entity.User">
+		select * from user
+	</select>
+</mapper>

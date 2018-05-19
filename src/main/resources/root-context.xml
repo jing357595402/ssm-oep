@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!-- dao层配置 -->
+	<!-- 1、配置数据源 -->
+	<!-- 1.1、加载配置文件 -->
+	<context:property-placeholder location="classpath:db.properties" />
+	<!-- 1.2、配置c3p0 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${db.driverClassName}" />
+		<property name="url" value="${db.url}" />
+		<property name="username" value="${db.username}" />
+		<property name="password" value="${db.password}" />
+		<!-- 初始化连接大小 -->
+		<property name="initialSize" value="${db.dhcp.initialSize}" />
+		<!-- 连接池最大数量 -->
+		<property name="maxActive" value="${db.dhcp.maxActive}" />
+		<!-- 连接池最大空闲 -->
+		<property name="maxIdle" value="${db.dhcp.maxIdle}" />
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="${db.dhcp.minIdle}" />
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="${db.dhcp.maxWait}" />
+	</bean>
+
+	<!--2、 mybatis sessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="typeAliasesPackage" value="com.yj.oep.entity"/> -->
+		<!-- <property name="configLocation" value="classpath:mybatis-config.xml" /> -->
+		<!-- 指定mapper.xml位置，如果mapper.xml定义符合规则，如接口在同一个包下，且命名相同，则可以不用配置 -->
+		<!-- <property name="mapperLocations" value="classpath*:com/**/dao/*Mapper.xml" /> -->
+	</bean>
+	<!-- 3、mapper扫描器 -->
+	<bean name="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 扫描包路径，如果需要扫描多个包，中间使用半角逗号隔开 -->
+		<property name="basePackage" value="com.yj.oep.mapper" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+
+	<!-- service层配置 -->
+	<!-- 1、注解扫描 -->
+	<context:annotation-config />
+	<context:component-scan base-package="com.yj.oep.service" />
+	<context:component-scan base-package="com.yj.oep.controller" />
+
+
+	<!-- ==========================配置事务 start=================================== -->
+	<!-- 1、配置事务管理器: org.springframework.orm.hibernate5.HibernateTransactionManager -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+		<!--提交异常是否回滚，默认false -->
+		<property name="rollbackOnCommitFailure" value="true" />
+	</bean>
+	<!-- 2、开启事务注解 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<!-- 3、在事务的具体使用方法的类上添加注解（一般在业务逻辑层【service】添加）:@Transactional -->
+	<!--============================ 配置事务 end=========================================== -->
+
+</beans>
